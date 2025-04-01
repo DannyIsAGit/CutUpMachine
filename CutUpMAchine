@@ -1,0 +1,73 @@
+import React, { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+
+export default function CutUpGenerator() {
+  const [originalTexts, setOriginalTexts] = useState(['', '', '', '']);
+  const [cutUpText, setCutUpText] = useState('');
+  const [scrambleType, setScrambleType] = useState('word');
+
+  const handleTextInput = (index, event) => {
+    const updatedTexts = [...originalTexts];
+    updatedTexts[index] = event.target.value;
+    setOriginalTexts(updatedTexts);
+  };
+
+  const handleCutUp = () => {
+    const const splitText = originalTexts
+      .filter(text => text)
+      .join(' ') // Combine all non-empty texts
+      .split(scrambleType === 'word' ? ' ' : '.');
+    const shuffledText = splitText.sort(() => 0.5 - Math.random());
+    setCutUpText(shuffledText.join(scrambleType === 'word' ? ' ' : '.'));
+  };
+
+  const handleScrambleTypeChange = (event) => setScrambleType(event.target.value);
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-5 flex flex-col items-center">
+      <h1 className="text-4xl mb-5 font-bold text-gray-700">Cut-Up Machine</h1>
+      <p className="text-lg mb-5 text-gray-500">Create literary chaos inspired by William Burroughs</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
+        <Card>
+          <CardContent>
+            {originalTexts.map((text, index) => (
+              <div key={index} className="mb-5">
+                <h2 className="text-2xl mb-2 font-semibold">Original Text {index + 1}</h2>
+                <textarea 
+                  className="w-full p-3 h-32 border border-gray-300 rounded-lg" 
+                  placeholder={`Paste text ${index + 1} here...`}
+                  value={text}
+                  onChange={(e) => handleTextInput(index, e)}
+                />
+              </div>
+            ))}</h2>
+            <textarea $1 onChange={(e) => handleTextInput(0, e)} 
+            />
+            <div className="mt-3">
+              <label className="block text-gray-600 mb-2">Scramble Type</label>
+              <select 
+                className="w-full p-2 border border-gray-300 rounded-lg" 
+                value={scrambleType}
+                onChange={handleScrambleTypeChange}
+              >
+                <option value="word">Word-based</option>
+                <option value="sentence">Sentence-based</option>
+              </select>
+            </div>
+            <Button className="mt-4" onClick={handleCutUp}>Generate Cut-Up</Button>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <h2 className="text-2xl mb-3 font-semibold">Cut-Up Text</h2>
+            <div className="w-full p-3 h-40 bg-gray-200 border border-gray-300 rounded-lg">
+              {cutUpText}
+            </div>
+            <Button className="mt-4" onClick={() => navigator.clipboard.writeText(cutUpText)}>Copy Cut-Up Text</Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
